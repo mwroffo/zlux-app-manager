@@ -65,12 +65,17 @@ export class SimpleWindowManagerService implements MVDWindowManagement.WindowMan
   showWindow(windowId: MVDWindowManagement.WindowId): void {
   }
 
+  requestWindowFocus(windowId: MVDWindowManagement.WindowId): boolean {
+    return true; //Dummy logic to avoid interface implementation errors for simple window service
+  }
+
   getViewportId(windowId: MVDWindowManagement.WindowId): MVDHosting.ViewportId {
     return this.theViewportId;
   }
 
-  spawnContextMenu(windowId: MVDWindowManagement.WindowId, xRelative: number, yRelative: number, items: ContextMenuItem[]): void {
+  spawnContextMenu(windowId: MVDWindowManagement.WindowId, xRelative: number, yRelative: number, items: ContextMenuItem[]): boolean {
     this.contextMenuRequested.next({xPos: xRelative, yPos: yRelative, items: items});
+    return true;
   }
     
   private generateWindowProviders(windowId: MVDWindowManagement.WindowId, viewportId: MVDHosting.ViewportId): Map<string, any> {

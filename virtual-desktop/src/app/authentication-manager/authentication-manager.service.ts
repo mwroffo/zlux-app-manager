@@ -15,13 +15,26 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BaseLogger } from 'virtual-desktop-logger';
+import { PluginManager } from 'app/plugin-manager/shared/plugin-manager';
 
-class ClearDispatcher implements MVDHosting.LogoutActionInterface {
+class ClearZoweZLUX implements MVDHosting.LogoutActionInterface {
   onLogout(username: string | null): boolean {
+    ZoweZLUX.notificationManager.removeAll()
     ZoweZLUX.dispatcher.clear();
     return true;
   }
 }
+
+class initializeNotificationManager implements MVDHosting.LoginActionInterface {
+  onLogin(username: string, plugins: ZLUX.Plugin[]): boolean {
+    ZoweZLUX.pluginManager.loadPlugins('bootstrap').then((res: any) => {
+      ZoweZLUX.notificationManager._setURL(ZoweZLUX.uriBroker.pluginWSUri(res[0], 'adminnotificationdata', ''),
+                                           ZoweZLUX.uriBroker.pluginRESTUri(res[0], 'adminnotificationdata', 'write'))
+    })
+    return true;
+  }
+}
+
 
 //5 minutes default. Less if session is shorter than twice this
 const WARNING_BEFORE_SESSION_EXPIRATION_MS = 300000; 
@@ -48,16 +61,21 @@ export class AuthenticationManager {
   private expirations: Map<string,number>;
   private expirationWarning: any;
   private readonly log: ZLUX.ComponentLogger = BaseLogger;
-  
+
   constructor(
     public http: Http,
-    private injector: Injector
+    private injector: Injector,
+    private pluginManager: PluginManager
+
   ) {
     this.log = BaseLogger.makeSublogger("auth");
     this.username = null;
     this.postLoginActions = new Array<MVDHosting.LoginActionInterface>();
     this.preLogoutActions = new Array<MVDHosting.LogoutActionInterface>();
-    this.registerPreLogoutAction(new ClearDispatcher());
+    this.registerPreLogoutAction(new ClearZoweZLUX());
+    this.registerPreLogoutAction(this.pluginManager)
+    this.registerPostLoginAction(new initializeNotificationManager());
+    this.registerPostLoginAction(this.pluginManager);
     this.loginScreenVisibilityChanged = new EventEmitter();
     this.loginExpirationIdleCheck = new EventEmitter();
   }
@@ -156,6 +174,7 @@ export class AuthenticationManager {
       let success = this.preLogoutActions[i].onLogout(this.username);
       this.log.debug(`LogoutAction ${i}=${success}`);
     }
+    ZoweZLUX.pluginManager.pluginsById.clear()
   }  
 
   private setSessionTimeoutWatcher(categories: any|undefined) {
@@ -227,6 +246,7 @@ export class AuthenticationManager {
         this.setSessionTimeoutWatcher(jsonMessage.categories);
         window.localStorage.setItem('username', username);
         this.username = username;
+        (ZoweZLUX.logger as any)._setBrowserUsername(username);
         this.performPostLoginActions().subscribe(
           ()=> {
             this.log.debug('Done performing post-login actions');
@@ -244,6 +264,7 @@ export class AuthenticationManager {
     return this.http.post(ZoweZLUX.uriBroker.serverRootUri('auth-logout'), {})
       .map(response => {
         this.username = null;
+        (ZoweZLUX.logger as any)._setBrowserUsername('N/A');
         return response;
       });
   }
