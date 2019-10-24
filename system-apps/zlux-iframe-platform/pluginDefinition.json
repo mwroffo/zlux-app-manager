@@ -1,0 +1,37 @@
+{
+  "identifier": "org.zowe.zlux.iframe.platform",
+  "apiVersion": "1.0.0",
+  "pluginVersion": "1.1.0",
+  "pluginType": "application",
+  "webContent": {
+    "framework": "angular2",
+    "launchDefinition": {
+      "pluginShortNameKey": "ZLUX iFrame Platform",
+      "pluginShortNameDefault": "ZLUX iFrame Platform",
+      "imageSrc": "assets/icon.png"
+    },
+    "descriptionKey": "",
+    "descriptionDefault": "",
+    "isSingleWindowApp": true,
+    "defaultWindowStyle": {
+      "width": 850,
+      "height": 450
+    }
+  },
+  "dataServices": [
+    
+  ],
+  "configurationData": {
+    "resources": {
+      "requests": {
+        "aggregationPolicy": "override",
+        "subResources": {
+          "app": {
+            "aggregationPolicy": "override"
+          }
+        }
+      }
+    }
+  }
+}
+  

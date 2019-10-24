@@ -1,0 +1,12 @@
+input {
+    margin: 1px;
+    width: 40em;
+    float: left;
+}
+.nav-buttons {
+    margin: 1px;
+    padding: 8px 20px;
+}
+#btn-submit {
+        /* float: right; */
+}

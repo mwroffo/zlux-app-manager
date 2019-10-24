@@ -1,0 +1,14 @@
+<div class="container">
+  <form
+    #urlForm="ngForm"
+    (ngSubmit)="handleFormSubmit(urlForm.value)">
+    <div>
+      <!-- <button href="#" type="button" class="btn btn-primary btn-large nav-buttons"> &#60; </button>
+      <button href="# "type="button" class="btn btn-primary btn-large nav-buttons"> > </button> -->
+      <button id="btn-submit" type="submit" class="btn btn-success">Go</button>
+      <input type="text" class="form-control" id="url" name="url" placeholder="Enter a URL, such as 'https://umass-pentest.github.io/'" ngModel>
+    </div>
+    
+  </form>
+
+</div>
