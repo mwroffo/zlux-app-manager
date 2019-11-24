@@ -13,18 +13,16 @@
 
 
     <div class="app-component">
-      <h2>{{title}} says: Hello, Zowe! </h2>
+      <h2>{{title}} says: Hello, world! </h2>
       <app-url-form (urlEvent)="handleUrlEvent($event)"></app-url-form>
       <iframe class="iframe-input" [src]="url" frameborder="0"
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
     </div>
 
     
   </div>
   
 </div>
-<zlux-popup-manager>
-</zlux-popup-manager>
 
 <!-- 
   This program and the accompanying materials are

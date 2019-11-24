@@ -1,13 +1,13 @@
 {
-  "identifier": "org.zowe.zlux.iframe.platform",
+  "identifier": "org.zowe.zlux.embedded.browser",
   "apiVersion": "1.0.0",
   "pluginVersion": "1.1.0",
   "pluginType": "application",
   "webContent": {
     "framework": "angular2",
     "launchDefinition": {
-      "pluginShortNameKey": "ZLUX iFrame Platform",
-      "pluginShortNameDefault": "ZLUX iFrame Platform",
+      "pluginShortNameKey": "ZLUX Embedded Browser",
+      "pluginShortNameDefault": "ZLUX Embedded Browser",
       "imageSrc": "assets/icon.png"
     },
     "descriptionKey": "",

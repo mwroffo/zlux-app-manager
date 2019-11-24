@@ -13,8 +13,6 @@
 import { Component, Inject } from '@angular/core';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
-import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
-
 import { HelloService } from './services/hello.service';
 import { SettingsService } from './services/settings.service';
 
@@ -25,11 +23,11 @@ import { DomSanitizer } from '@angular/platform-browser';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [HelloService, ZluxPopupManagerService, SettingsService]
+  providers: [HelloService, SettingsService]
 })
 
 export class AppComponent {
-  title: string = 'zlux-iframe-platform';
+  title: string = 'zlux embedded browser';
 
   @Language() lang: string;
 
@@ -65,13 +63,11 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
-    private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
     private settingsService: SettingsService) {   
     //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
     this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
     this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
-    this.popupManager.setLogger(log);
     if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
       this.handleLaunchOrMessageObject(this.launchMetadata.data);
     }
