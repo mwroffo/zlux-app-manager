@@ -239,10 +239,10 @@ export class AppComponent {
           this.log.warn((message = 'Invalid target mode or action type specified'));        
         }
       } else {
-        this.popupManager.reportError(
-          ZluxErrorSeverity.WARNING,
-          this.translation.translate('invalid_plugin_identifier'), // 
-          `${this.translation.translate('no_plugin_found_for_identifier')} ${this.targetAppId}`, popupOptions);
+        // this.popupManager.reportError(
+        //   ZluxErrorSeverity.WARNING,
+        //   this.translation.translate('invalid_plugin_identifier'), // 
+        //   `${this.translation.translate('no_plugin_found_for_identifier')} ${this.targetAppId}`, popupOptions);
       }
       
       this.callStatus = message;
