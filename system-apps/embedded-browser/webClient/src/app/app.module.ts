@@ -45,7 +45,9 @@ const l10nConfig: L10nConfig = {
     FormsModule,
     TranslationModule.forRoot(l10nConfig)
   ],
-  providers: [HelloService],
+  providers: [
+    HelloService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { 
