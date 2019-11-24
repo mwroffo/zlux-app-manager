@@ -10,18 +10,11 @@
 
 <div class="app-component test-panel-container">
   <div class="test-panel plugin-test-panel">
-
-
-    <div class="app-component">
-      <h2>{{title}} says: Hello, world! </h2>
-      <app-url-form (urlEvent)="handleUrlEvent($event)"></app-url-form>
-      <iframe class="iframe-input" [src]="url" frameborder="0"
-        allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
-    </div>
-
-    
+    hello from app.component.html
+    <app-url-form (urlEvent)="handleUrlEvent($event)"></app-url-form>
+    <h2>{{title}} says: Hello, world! </h2>
+    <iframe class="iframe-input" [src]="url" frameborder="0" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
   </div>
-  
 </div>
 
 <!-- 

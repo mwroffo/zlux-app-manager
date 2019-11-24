@@ -9,25 +9,27 @@
   
   Copyright Contributors to the Zowe Project.
 */
-
+import { DomSanitizer } from '@angular/platform-browser';
 import { Component, Inject } from '@angular/core';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+
+import { ZluxPopupManagerService, ZluxErrorSeverity } from '@zlux/widgets';
 
 import { HelloService } from './services/hello.service';
 import { SettingsService } from './services/settings.service';
 
 import { LocaleService, TranslationService, Language } from 'angular-l10n';
-import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [HelloService, SettingsService]
+  providers: [HelloService, ZluxPopupManagerService, SettingsService]
 })
 
 export class AppComponent {
-  title: string = 'zlux embedded browser';
+  url: any = 'https://mwroffo.github.io';
+  title: string = 'my zowe embedded browser';
 
   @Language() lang: string;
 
@@ -54,8 +56,6 @@ export class AppComponent {
   helloText = '';
   serverResponseMessage: string;
 
-  url: any = '';
-
   constructor(
     private sanitizer: DomSanitizer,
     public locale: LocaleService,
@@ -63,20 +63,22 @@ export class AppComponent {
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,    
     @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
+    private popupManager: ZluxPopupManagerService,
     private helloService: HelloService,
     private settingsService: SettingsService) {   
-    //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
-    this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
-    this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
-    if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
-      this.handleLaunchOrMessageObject(this.launchMetadata.data);
+      //is there a better way so that I can get this info into the HelloService constructor instead of calling a set method directly after creation???
+      this.helloService.setDestination(ZoweZLUX.uriBroker.pluginRESTUri(this.pluginDefinition.getBasePlugin(), 'hello',""));
+      this.settingsService.setPlugin(this.pluginDefinition.getBasePlugin());
+      this.popupManager.setLogger(log);
+      if (this.launchMetadata != null && this.launchMetadata.data != null && this.launchMetadata.data.type != null) {
+        this.handleLaunchOrMessageObject(this.launchMetadata.data);
+      }
     }
-  }
-
-  handleUrlEvent($event: any) {
-    this.url = $event;
-    this.url = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
-  }
+    // mine:
+    handleUrlEvent($event: any) {
+      this.url = $event;
+      this.url = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
+    }
 
   handleLaunchOrMessageObject(data: any) {
     switch (data.type) {
@@ -239,10 +241,10 @@ export class AppComponent {
           this.log.warn((message = 'Invalid target mode or action type specified'));        
         }
       } else {
-        // this.popupManager.reportError(
-        //   ZluxErrorSeverity.WARNING,
-        //   this.translation.translate('invalid_plugin_identifier'), // 
-        //   `${this.translation.translate('no_plugin_found_for_identifier')} ${this.targetAppId}`, popupOptions);
+        this.popupManager.reportError(
+          ZluxErrorSeverity.WARNING,
+          this.translation.translate('invalid_plugin_identifier'), // 
+          `${this.translation.translate('no_plugin_found_for_identifier')} ${this.targetAppId}`, popupOptions);
       }
       
       this.callStatus = message;

@@ -26,7 +26,7 @@ export class HelloService {
 
   sayHello(text: string): Observable<any> {
     const requestBody = {
-      "_objectType": "org.zowe.zlux.embedded.browser.request.hello",
+      "_objectType": "org.zowe.zlux.sample.angular.request.hello",
       "_metaDataVersion": "1.0.0",
       "messageFromClient": text
     }
