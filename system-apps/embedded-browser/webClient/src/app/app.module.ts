@@ -11,28 +11,10 @@
 */
 import { UrlFormComponent } from './url-form/url-form.component';
 import { CommonModule } from '@angular/common';
-import { NgModule, Inject } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ZluxButtonModule, ZluxPopupManagerModule } from '@zlux/widgets';
-
 import { AppComponent } from './app.component';
-import {HelloService} from './services/hello.service';
-
-// import { L10nConfig, L10nLoader, TranslationModule, StorageStrategy, ProviderType } from 'angular-l10n';
-import { TranslationModule, L10nConfig, ISOCode, L10nLoader, LOCALE_CONFIG,
-  TRANSLATION_CONFIG, LocaleConfig, TranslationConfig } from 'angular-l10n';
-import { Angular2L10nConfig, Angular2InjectionTokens } from 'pluginlib/inject-resources';
-
-
-const l10nConfig: L10nConfig = {
-  translation: {
-      providers: [],
-      composedLanguage: [ISOCode.Language, ISOCode.Country],
-      caching: true,
-      missingValue: 'No key'
-  }
-};
 
 
 @NgModule({
@@ -41,27 +23,17 @@ const l10nConfig: L10nConfig = {
     UrlFormComponent
   ],
   imports: [
-    // BrowserModule, /* remove this for within-MVD development */
     CommonModule,
-    FormsModule,
-    ZluxButtonModule,
-    ZluxPopupManagerModule,
-    TranslationModule.forRoot(l10nConfig)
+    FormsModule
   ],
-  providers: [HelloService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { 
   constructor(
-    private l10nLoader: L10nLoader,
-    @Inject(Angular2InjectionTokens.L10N_CONFIG) private l10nConfig: Angular2L10nConfig,
-    @Inject(LOCALE_CONFIG) private localeConfig: LocaleConfig,
-    @Inject(TRANSLATION_CONFIG) private translationConfig: TranslationConfig,
-
+    
   ) {
-    this.localeConfig.defaultLocale = this.l10nConfig.defaultLocale;
-    this.translationConfig.providers = this.l10nConfig.providers;
-    this.l10nLoader.load();
+    
   }
 }
 
