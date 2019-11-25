@@ -28,13 +28,19 @@ export class AppComponent {
     ) {   
       
     }
-    // mine:
-    handleUrlEvent($event: any) {
-      this.url = $event;
-      this.url = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
-    }
-}
 
+  handleUrlEvent($event: any) {
+    this.url = $event;
+    this.url = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
+  }
+  iframeLoaded() {
+    const iframe: any = document.getElementById('browser-iframe');
+    console.log(`iframe =`, iframe)
+    const newHeight = iframe.contentWindow.document.body.scrollHeight + "px";
+    console.log(`giving iframe newHeight= ${newHeight}`);
+    iframe.height = newHeight;
+  }
+}
 
 /*
   This program and the accompanying materials are
