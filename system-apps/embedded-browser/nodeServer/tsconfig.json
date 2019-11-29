@@ -1,0 +1,19 @@
+{
+  "compileOnSave": true,
+  "include": [
+    "ts/*.ts"
+  ],
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "./lib",
+    "sourceMap": true,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "types": [
+      "node",
+      "express"
+    ],
+    "experimentalDecorators": true
+  }
+}
