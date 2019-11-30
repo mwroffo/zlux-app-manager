@@ -1,19 +1,28 @@
 {
   "compileOnSave": true,
   "include": [
-    "ts/*.ts"
+    "src/**/*",
+    "test/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "files": [
+    "src/proxy-plugin.ts",
+    "test/proxy-test.ts"
   ],
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "outDir": "./lib",
     "sourceMap": true,
-    "allowJs": true,
     "moduleResolution": "node",
     "types": [
       "node",
-      "express"
+      "express",
+      "mocha",
+      "chai"
     ],
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+
   }
 }
