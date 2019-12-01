@@ -63,6 +63,8 @@ export class EmbeddedBrowserProxy {
             try {
                 let chunks = [];
                 let obj = null;
+
+                // read POST body to get options
                 req.on('data', chunk => {
                     chunks.push(chunk)
                 })
@@ -72,12 +74,13 @@ export class EmbeddedBrowserProxy {
                     console.log(`obj is`,obj)
                     options = obj;
 
+                    // craft forward request
                     const req2: ClientRequest = http.request(options, (res2: IncomingMessage) => {
                         console.log(`res2 status ${res2.statusCode}`)
                         console.log(`res2.headers before pipe:`,res2.headers) // res2 is http.IncomingMessage, which is a readable Stream
                         res.status(res2.statusCode) // set res status to whatever res2 status is
                         // res2.removeHeader('x-frame-options')
-                        res2.pipe(res)
+                        res2.pipe(res) // proxy forwards response back to the browser
                         console.log(`res.headers after pipe:`, res.getHeaders())
                         res.getHeaders()
                     })
@@ -85,7 +88,8 @@ export class EmbeddedBrowserProxy {
     
                     if ((req.method == 'POST') || (req.method == 'PUT')) {
                         console.log('Callservice: Forwarding request body to service');
-                        req.pipe(req2);
+                        // TODO but isn't the req stream empty by now?
+                        req.pipe(req2); // forward original request body to the forward-request.
                     } else {
                         console.log('Callservice: Issuing request to service');
                         req2.end();
