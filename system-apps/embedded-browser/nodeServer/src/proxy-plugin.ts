@@ -50,7 +50,7 @@ export class EmbeddedBrowserProxy {
             // ineffective 
             // const httpApi = req.protocol == http? http: https;
             // console.log(`httpApi = ${req.protocol == http}`)
-            const options = {
+            let options = {
                 'hostname':'www.google.com',
                 'port':80,
                 'path':'/',
@@ -61,27 +61,37 @@ export class EmbeddedBrowserProxy {
                 }
             };
             try {
-                const req2: ClientRequest = http.request(options, (res2: IncomingMessage) => {
-                    console.log(`res2 status ${res2.statusCode}`)
-                    console.log(`res2.headers before pipe:`,res2.headers) // res2 is http.IncomingMessage, which is a readable Stream
-                    res.status(res2.statusCode) // set res status to whatever res2 status is
-                    res2.pipe(res)
-                    // res2.pipe(process.stdout) // stream all res2 data into res.
-                    res.set('x-frame-options','') // res is http.ServerResponse, which is a Writable stream
-                    res.setHeader('x-frame-options','nay')
-                    res.removeHeader('x-frame-options')
-                    // res.send() // express's helper for pipe. superfluous.
+                let chunks = [];
+                let obj = null;
+                req.on('data', chunk => {
+                    chunks.push(chunk)
                 })
-                req2.on('error', (e:Error) => console.log(`req2 error: ${e.message}`))
+                req.on('end', () => {
+                    const strObj = Buffer.concat(chunks).toString()
+                    obj = JSON.parse(strObj)
+                    console.log(`obj is`,obj)
+                    options = obj;
 
-                if ((req.method == 'POST') || (req.method == 'PUT')) {
-                    console.log('Callservice: Forwarding request body to service');
-                    req.pipe(req2);
-                } else {
-                    console.log('Callservice: Issuing request to service');
-                    req2.end();
-                }
+                    const req2: ClientRequest = http.request(options, (res2: IncomingMessage) => {
+                        console.log(`res2 status ${res2.statusCode}`)
+                        console.log(`res2.headers before pipe:`,res2.headers) // res2 is http.IncomingMessage, which is a readable Stream
+                        res.status(res2.statusCode) // set res status to whatever res2 status is
+                        // res2.removeHeader('x-frame-options')
+                        res2.pipe(res)
+                        console.log(`res.headers after pipe:`, res.getHeaders())
+                        res.getHeaders()
+                    })
+                    req2.on('error', (e:Error) => console.log(`req2 error: ${e.message}`))
+    
+                    if ((req.method == 'POST') || (req.method == 'PUT')) {
+                        console.log('Callservice: Forwarding request body to service');
+                        req.pipe(req2);
+                    } else {
+                        console.log('Callservice: Issuing request to service');
+                        req2.end();
+                    }
                 
+                })
             } catch (err) {
                 throw err;
             }
