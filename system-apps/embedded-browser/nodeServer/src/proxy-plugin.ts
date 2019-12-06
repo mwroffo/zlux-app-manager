@@ -23,16 +23,15 @@ const https = require('https');
 export class EmbeddedBrowserProxy {
 
     private router: Router;
+    
+    
 
-    constructor() {
+    constructor(
+        private options: object) {
         
         const router = express.Router();
 
-        let options = {
-            isHttps: false,
-            allowInvalidTLSProxy: true // hardcode for now
-        }
-        
+        // passed arrow func is analogous to `makeSimpleProxy`:
         router.use((req: Request,res: Response) => {
 
             let messageFromClient = req.body ? req.body.messageFromClient : "<No/Empty Message Received from Client>"
@@ -47,60 +46,42 @@ export class EmbeddedBrowserProxy {
         
                 from client`
             }
-            // ineffective 
-            // const httpApi = req.protocol == http? http: https;
-            // console.log(`httpApi = ${req.protocol == http}`)
-            let options = {
-                'hostname':'www.google.com',
-                'port':80,
-                'path':'/',
-                'method':'GET',
-                'headers': {
-                    // 'Content-Type':'application/json',
-                    // 'Content-Length':Buffer.byteLength(messageFromClient)
-                }
-            };
+
             try {
-                let chunks = [];
-                let obj = null;
 
-                // read POST body to get options
-                req.on('data', chunk => {
-                    chunks.push(chunk)
-                })
-                req.on('end', () => {
-                    const strObj = Buffer.concat(chunks).toString()
-                    obj = JSON.parse(strObj)
-                    console.log(`obj is`,obj)
-                    options = obj;
 
-                    // craft forward request
-                    const req2: ClientRequest = http.request(options, (res2: IncomingMessage) => {
-                        console.log(`res2 status ${res2.statusCode}`)
-                        console.log(`res2.headers before pipe:`,res2.headers) // res2 is http.IncomingMessage, which is a readable Stream
-                        res.status(res2.statusCode) // set res status to whatever res2 status is
-                        // res2.removeHeader('x-frame-options')
-                        res2.pipe(res) // proxy forwards response back to the browser
-                        console.log(`res.headers after pipe:`, res.getHeaders())
-                        res.getHeaders()
-                    })
-                    req2.on('error', (e:Error) => console.log(`req2 error: ${e.message}`))
-    
-                    if ((req.method == 'POST') || (req.method == 'PUT')) {
-                        console.log('Callservice: Forwarding request body to service');
-                        // TODO but isn't the req stream empty by now?
-                        req.pipe(req2); // forward original request body to the forward-request.
-                    } else {
-                        console.log('Callservice: Issuing request to service');
-                        req2.end();
+                    
+                // craft forward request
+                // uses options taken as constructor:
+                const req2: ClientRequest = http.request(options, (res2: IncomingMessage) => {
+                    console.log(`res2 status ${res2.statusCode}`)
+                    console.log(`res2.headers before pipe:`,res2.headers) // res2 is http.IncomingMessage, which is a readable Stream
+                    res.status(res2.statusCode) // set res status to whatever res2 status is
+                    for (const header in res2.headers) {
+                        res.setHeader(header, res2.headers[header])
                     }
-                
+                    res.removeHeader('x-frame-options')
+                    res.removeHeader('access-control-allow-origin')
+                    res2.pipe(res) // proxy forwards IncomingMessage to ServerResponse
+                    
+                    console.log(`res.headers after pipe:`, res.getHeaders())
+                    res.getHeaders()
                 })
+                req2.on('error', (e:Error) => console.log(`req2 error: ${e.message}`))
+
+                if ((req.method == 'POST') || (req.method == 'PUT')) {
+                    console.log('Callservice: Forwarding request body to service');
+                    // TODO but isn't the req stream empty by now?
+                    req.pipe(req2); // forward original request body to the forward-request.
+                } else {
+                    console.log('Callservice: Issuing request to service');
+                    req2.end();
+                }
+                
+
             } catch (err) {
                 throw err;
             }
-            
-            // console.log(`client gives headers`,req.headers); 
         });
 
         this.router = router;        
@@ -111,16 +92,26 @@ export class EmbeddedBrowserProxy {
     }
 }
 
-function getEmbeddedBrowserProxy(): Router {
+function getEmbeddedBrowserProxy(options): Router {
     return new Promise(function(resolve, reject) {
-        let embeddedBrowserProxy = new EmbeddedBrowserProxy();
+        let embeddedBrowserProxy = new EmbeddedBrowserProxy(options);
         resolve(embeddedBrowserProxy.getRouter());
     });
 }
 
 const app = express()
-const app2 = express()
-const router = new EmbeddedBrowserProxy().getRouter()
+
+let options = {
+    'hostname': 'www.google.com',
+    'port': 80,
+    'path': '/',
+    'method': 'GET',
+    'headers': {
+        // 'Content-Type':'application/json',
+        // 'Content-Length':Buffer.byteLength(messageFromClient)
+    }
+};
+const router = new EmbeddedBrowserProxy(options).getRouter()
 app.use('/', router) // router can be passed like a callback
 app.listen(3000)
 
